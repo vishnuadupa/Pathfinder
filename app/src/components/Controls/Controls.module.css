@@ -1,14 +1,20 @@
 .bar {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 14px 24px;
-  background: rgba(13, 17, 23, 0.75);
+  padding: 12px 24px;
+  background: rgba(10, 14, 22, 0.75);
   backdrop-filter: blur(16px) saturate(140%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
   flex-wrap: wrap;
-  z-index: 1001;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+  z-index: 1002;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: border-color 0.3s ease;
 }
 
 .group {
@@ -55,6 +61,13 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+.select option {
+  background-color: #0b0f17;
+  color: #f3f4f6;
+  padding: 8px;
+}
+
 
 /* Custom Toggle Groups */
 .toggle {
@@ -176,3 +189,15 @@
   border-color: rgba(239, 68, 68, 0.25);
   color: #f87171;
 }
+
+@media (max-width: 1024px) {
+  .bar {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    margin: 12px;
+  }
+}
+

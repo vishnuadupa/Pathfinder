@@ -1,12 +1,18 @@
 .panel {
-  background: rgba(13, 17, 23, 0.85);
-  backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  max-height: 200px;
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 420px; /* Leave space for the 380px wide floating sidebar */
+  background: rgba(10, 14, 22, 0.75);
+  backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  max-height: 220px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.25);
-  z-index: 1000;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  z-index: 1002;
+  overflow: hidden;
 }
 
 .header {
@@ -168,3 +174,16 @@
   color: #f87171;
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
+
+@media (max-width: 1024px) {
+  .panel {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    margin: 12px;
+    max-height: none;
+  }
+}
+

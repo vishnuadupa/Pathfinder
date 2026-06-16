@@ -54,14 +54,17 @@ body {
   display: flex;
   flex: 1;
   overflow: hidden;
+  position: relative; /* Support absolute positioned floating HUD overlays */
 }
 
 .mapArea {
-  position: relative;
-  flex: 0 0 70%;
-  min-width: 0;
-  border-right: 1px solid var(--border-subtle);
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-right: none;
   background: #090a0f;
+  z-index: 1; /* Map is at the base */
 }
 
 /* Premium Floating Hints & Badges */
