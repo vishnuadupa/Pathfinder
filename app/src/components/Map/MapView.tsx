@@ -26,10 +26,11 @@ const TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
 const TILE_ATTR = '&copy; <a href="https://carto.com/">CARTO</a>';
 
 const C_START    = '#10b981'; // Emerald/Green
-const C_END      = '#f43f5e'; // Coral/Rose
-const C_PATH     = '#34d399'; // Mint/Emerald Path
-const C_FLOOD    = '#3b82f6';
+const C_END      = '#ff5500'; // Neon Orange
+const C_PATH     = '#00ffd2'; // Cyber Cyan Path
+const C_FLOOD    = '#2563eb'; // Instrument Blueprint Blue
 const C_CLOSURE  = '#ef4444';
+
 
 // Redraw all canvas contents from scratch (background traffic + explored routes)
 // FIX ISSUE 3: caller must reset prevExploredLenRef after calling this.
@@ -98,7 +99,7 @@ function redrawAllCanvas(
       const p2 = project(toNode.lat, toNode.lng);
 
       // Glow aura
-      ctx.strokeStyle = 'rgba(244, 63, 94, 0.12)';
+      ctx.strokeStyle = 'rgba(255, 85, 0, 0.12)';
       ctx.lineWidth = 4.5;
       ctx.beginPath();
       ctx.moveTo(p1.x, p1.y);
@@ -106,7 +107,7 @@ function redrawAllCanvas(
       ctx.stroke();
 
       // Vibrant core
-      ctx.strokeStyle = '#f43f5e';
+      ctx.strokeStyle = '#ff5500';
       ctx.lineWidth = 1.6;
       ctx.beginPath();
       ctx.moveTo(p1.x, p1.y);
@@ -124,12 +125,12 @@ function redrawAllCanvas(
         // Outer glow
         ctx.beginPath();
         ctx.arc(sp.x, sp.y, 6, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(244, 63, 94, 0.25)';
+        ctx.fillStyle = 'rgba(255, 85, 0, 0.25)';
         ctx.fill();
         // Bright core dot
         ctx.beginPath();
         ctx.arc(sp.x, sp.y, 3, 0, Math.PI * 2);
-        ctx.fillStyle = '#f43f5e';
+        ctx.fillStyle = '#ff5500';
         ctx.fill();
       }
     }

@@ -39,6 +39,7 @@ export function Landing() {
   const [progress, setProgress] = useState(0);
   const [activeAlgo, setActiveAlgo] = useState("A* Search Heuristics");
   const [edgesDrawn, setEdgesDrawn] = useState(0);
+  const [telemetryLogs, setTelemetryLogs] = useState<string[]>([]);
 
   // ── Init Leaflet map (frozen / decorative) ───────────────────────────────
   useEffect(() => {
@@ -192,6 +193,13 @@ export function Landing() {
     setProgress(0);
     setEdgesDrawn(0);
 
+    const initialLogs = [
+      `[0.00s] SYSTEM: INITIALIZING HUD SEARCH GRID`,
+      `[0.02s] SOLVER: SELECTED SUBPROCESS "${algoName.toUpperCase()}"`,
+      `[0.05s] SEEDING: PROJECTED ${numSeeds} SPATIAL ORIGINS ON MANHATTAN GRID`,
+    ];
+    setTelemetryLogs(initialLogs);
+
     const project = (lat: number, lng: number) => {
       const topLeft = map.containerPointToLayerPoint([0, 0]);
       const lp      = map.latLngToLayerPoint([lat, lng]);
@@ -205,7 +213,8 @@ export function Landing() {
       edgeIndex  += EDGES_PER_FRAME;
 
       setEdgesDrawn(edgeIndex);
-      setProgress(Math.round((edgeIndex / edges.length) * 100));
+      const currentProgress = Math.round((edgeIndex / edges.length) * 100);
+      setProgress(currentProgress);
 
       ctx.lineCap  = 'round';
       ctx.lineJoin = 'round';
@@ -219,7 +228,7 @@ export function Landing() {
         const p2 = project(to.lat,   to.lng);
 
         // Glow aura
-        ctx.strokeStyle = 'rgba(244,63,94,0.12)';
+        ctx.strokeStyle = 'rgba(255,85,0,0.12)';
         ctx.lineWidth   = 4.5;
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
@@ -227,7 +236,7 @@ export function Landing() {
         ctx.stroke();
 
         // Vibrant core
-        ctx.strokeStyle = '#f43f5e';
+        ctx.strokeStyle = '#ff5500';
         ctx.lineWidth   = 1.6;
         ctx.beginPath();
         ctx.moveTo(p1.x, p1.y);
@@ -235,9 +244,18 @@ export function Landing() {
         ctx.stroke();
       }
 
+      if (batch.length > 0) {
+        const targetNode = batch[0][1];
+        const nodeObj = graph.nodes[targetNode];
+        const timestamp = (performance.now() / 1000).toFixed(2);
+        const logMsg = `[${timestamp}s] RELAX: node_${targetNode.slice(0, 5)}... @ [${nodeObj?.lat.toFixed(4)}, ${nodeObj?.lng.toFixed(4)}]`;
+        setTelemetryLogs(prev => [...prev, logMsg].slice(-16));
+      }
+
       if (edgeIndex < edges.length) {
         rafRef.current = requestAnimationFrame(drawNextBatch);
       } else {
+        setTelemetryLogs(prev => [...prev, `[CYCLE] COMPLETED Wavefront Sweep. Resetting in 2.0s.`].slice(-16));
         cycleTimerRef.current = setTimeout(() => startMoldCycle(), 2000);
       }
     };
@@ -263,11 +281,11 @@ export function Landing() {
       <div className={styles.hudHeader}>
         <div className={styles.hudBadge}>
           <span className={styles.hudDot} />
-          SYSTEM STATUS: ONLINE
+          SYSTEM_STATE: RUNNING_AUTO
         </div>
         <div className={styles.hudStats}>
-          <span className={styles.hudStat}>REGION: <strong>NEW YORK CITY (MANHATTAN)</strong></span>
-          <span className={styles.hudStat}>STREET INDEX: <strong>15,422 SEGMENTS</strong></span>
+          <span className={styles.hudStat}>REGION: <strong>NYC_MANHATTAN</strong></span>
+          <span className={styles.hudStat}>INDEX: <strong>15.42k SEGMENTS</strong></span>
         </div>
       </div>
 
@@ -275,84 +293,82 @@ export function Landing() {
         {/* Left Control Center Panel */}
         <div className={styles.controlPanel}>
           <div className={styles.titleBlock}>
-            <div className={styles.brandBadge}>ALGORITHMIC SIMULATION SUITE</div>
+            <div className={styles.brandBadge}>CORE TOPOLOGY SOLVER</div>
             <h1 className={styles.titleMain}>
               Pathfinder<span className={styles.plus}>+</span>
             </h1>
             <p className={styles.titleSub}>
-              A high-fidelity visualizer for graph pathfinding mechanics. Experience real-time wavefront propagation, congestion simulation, and topological search solvers in motion.
+              An interactive GIS instrument visualizing graph pathfinding mechanics. Observe wavefront propagation, dynamically adjusted congestion models, and negative cycle relaxation live.
             </p>
           </div>
 
           <Link to="/app" className={styles.ctaButton}>
-            Launch Visualizer <span className={styles.arrow}>&rarr;</span>
+            LAUNCH SYSTEM SIMULATOR
           </Link>
 
           {/* Reference Solver Info */}
           <div className={styles.algoSection}>
-            <h3 className={styles.sectionHeader}>SUPPORTED SOLVERS</h3>
+            <h3 className={styles.sectionHeader}>SOLVER REGISTER</h3>
             <div className={styles.algoGrid}>
               <div className={styles.algoItem}>
                 <span className={styles.algoNum}>01</span>
                 <div>
-                  <span className={styles.algoName}>A* Search & Dijkstra</span>
-                  <span className={styles.algoDesc}>Weighted shortest-path solvers</span>
+                  <span className={styles.algoName}>A* & Dijkstra Solvers</span>
+                  <span className={styles.algoDesc}>Optimal weighted shortest path search</span>
                 </div>
               </div>
               <div className={styles.algoItem}>
                 <span className={styles.algoNum}>02</span>
                 <div>
-                  <span className={styles.algoName}>Bellman-Ford (SPFA)</span>
-                  <span className={styles.algoDesc}>Queue-optimized routing</span>
+                  <span className={styles.algoName}>Bellman-Ford SPFA</span>
+                  <span className={styles.algoDesc}>Queue-optimized negative edge solver</span>
                 </div>
               </div>
               <div className={styles.algoItem}>
                 <span className={styles.algoNum}>03</span>
                 <div>
                   <span className={styles.algoName}>BFS & DFS Traversals</span>
-                  <span className={styles.algoDesc}>Unweighted graph search</span>
+                  <span className={styles.algoDesc}>Unweighted spatial expansion</span>
                 </div>
               </div>
               <div className={styles.algoItem}>
                 <span className={styles.algoNum}>04</span>
                 <div>
                   <span className={styles.algoName}>Greedy Best-First</span>
-                  <span className={styles.algoDesc}>Heuristic-based exploration</span>
+                  <span className={styles.algoDesc}>Heuristic-based grid convergence</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Telemetry Panel */}
+        {/* Right Telemetry Terminal Panel */}
         <div className={styles.telemetryPanel}>
           <div className={styles.telemetryHeader}>
-            <span className={styles.telemetryTitle}>LIVE RUNTIME SIMULATION</span>
-            <span className={styles.telemetryBadge}>ACTIVE</span>
+            <span className={styles.telemetryTitle}>TELEMETRY STREAM // {activeAlgo.toUpperCase()}</span>
+            <span className={styles.telemetryBadge}>LIVE_FEED</span>
           </div>
 
-          <div className={styles.telemetryGrid}>
-            <div className={styles.telemetryItem}>
-              <span className={styles.telemetryLabel}>BACKGROUND SOLVER</span>
-              <span className={styles.telemetryValue}>{activeAlgo}</span>
+          <div className={styles.terminalBox}>
+            <div className={styles.terminalHeader}>
+              <span className={styles.terminalHeaderTitle}>SYS_LOG.stdout</span>
+              <span className={styles.terminalHeaderStats}>
+                {seedsCount} ORIGINS | {edgesDrawn} EDGES | {progress}% CONVERGENCE
+              </span>
             </div>
-            <div className={styles.telemetryItem}>
-              <span className={styles.telemetryLabel}>ACTIVE SEED ORIGINS</span>
-              <span className={styles.telemetryValue}>{seedsCount} COORDINATES</span>
-            </div>
-            <div className={styles.telemetryItem}>
-              <span className={styles.telemetryLabel}>PROPAGATED EDGES</span>
-              <span className={styles.telemetryValue}>{edgesDrawn.toLocaleString()} / {progress}%</span>
-            </div>
-            <div className={styles.telemetryItem}>
-              <span className={styles.telemetryLabel}>TELEMETRY PROFILE</span>
-              <span className={styles.telemetryValue}>RAF ACCELERATED</span>
-            </div>
+            <pre className={styles.terminalBody}>
+              {telemetryLogs.map((log, index) => (
+                <div key={index} className={styles.terminalLine}>
+                  <span className={styles.terminalLineNum}>{(index + 1).toString().padStart(2, '0')}</span>
+                  <span className={styles.terminalLineText}>{log}</span>
+                </div>
+              ))}
+            </pre>
           </div>
 
           <div className={styles.chartContainer}>
             <div className={styles.chartBar} style={{ width: `${progress}%` }} />
-            <div className={styles.chartText}>SOLVER WAVEFRONT CONVERGENCE PROGRESS</div>
+            <div className={styles.chartText}>FRONT WAVE CONVERGENCE INDEX // {progress}%</div>
           </div>
         </div>
       </div>

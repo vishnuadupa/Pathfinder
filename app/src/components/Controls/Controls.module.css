@@ -35,7 +35,7 @@
   background: rgba(255, 255, 255, 0.03);
   color: var(--text-primary);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 8px 14px;
   font-size: 13px;
   font-weight: 500;
@@ -53,8 +53,8 @@
 
 .select:focus {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15);
-  background: rgba(13, 17, 23, 0.9);
+  box-shadow: 0 0 0 3px rgba(255, 85, 0, 0.15);
+  background: rgba(10, 14, 22, 0.95);
 }
 
 .select:disabled {
@@ -73,7 +73,7 @@
 .toggle {
   display: flex;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  border-radius: 4px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.02);
   padding: 2px;
@@ -87,7 +87,7 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 2px;
   transition: all 0.2s ease;
   font-family: var(--font-sans);
 }
@@ -111,7 +111,7 @@
 /* Interactive Action Buttons */
 .btn {
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 9px 18px;
   font-size: 13px;
   font-weight: 600;
@@ -169,13 +169,13 @@
 .calculate {
   background: var(--color-accent);
   color: white;
-  border-color: rgba(244, 63, 94, 0.5);
-  box-shadow: 0 4px 12px rgba(244, 63, 94, 0.2);
+  border-color: rgba(255, 85, 0, 0.5);
+  box-shadow: 0 4px 12px rgba(255, 85, 0, 0.2);
 }
 
 .calculate:not(:disabled):hover {
-  background: #fb7185; /* rose-400 */
-  box-shadow: 0 4px 18px rgba(244, 63, 94, 0.35);
+  background: #ff7733; /* lighter orange */
+  box-shadow: 0 4px 18px rgba(255, 85, 0, 0.35);
 }
 
 .reset {

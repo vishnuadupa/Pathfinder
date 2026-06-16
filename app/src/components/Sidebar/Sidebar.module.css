@@ -51,12 +51,6 @@
   margin: 0;
 }
 
-/* Complexity Cards */
-.complexity {
-  display: flex;
-  gap: 12px;
-}
-
 .complexityItem {
   flex: 1;
   display: flex;
@@ -64,12 +58,12 @@
   gap: 4px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 10px 14px;
   font-size: 13px;
   font-weight: 600;
-  color: var(--text-primary);
-  font-family: var(--font-sans);
+  color: var(--color-cyan);
+  font-family: var(--font-mono);
   transition: all 0.2s ease;
 }
 
@@ -88,14 +82,14 @@
 
 /* Pseudocode Frame */
 .pseudocodeBox {
-  background: rgba(8, 9, 13, 0.95);
+  background: rgba(4, 6, 8, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 10px;
+  border-radius: 4px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   flex: 1;
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
 .pseudocodeHeader {
@@ -115,10 +109,10 @@
 .progressBadge {
   font-size: 9px;
   font-weight: 700;
-  color: #22d3ee;
-  background: rgba(6, 182, 212, 0.1);
-  border: 1px solid rgba(6, 182, 212, 0.2);
-  border-radius: 99px;
+  color: var(--color-cyan);
+  background: rgba(0, 255, 210, 0.08);
+  border: 1px solid rgba(0, 255, 210, 0.2);
+  border-radius: 2px;
   padding: 1px 6px;
   font-family: var(--font-mono);
   text-transform: none;
@@ -146,11 +140,11 @@
 
 /* Pulsing Active Code highlight */
 .codeLine.activeLine {
-  background: rgba(6, 182, 212, 0.12); /* Cyan neon glow tint */
-  color: #22d3ee;
-  border-left-color: #06b6d4;
+  background: rgba(255, 85, 0, 0.12); /* neon orange active glow */
+  color: #ffaa77;
+  border-left-color: #ff5500;
   font-weight: 500;
-  text-shadow: 0 0 6px rgba(6, 182, 212, 0.45);
+  text-shadow: 0 0 6px rgba(255, 85, 0, 0.45);
 }
 
 .lineNum {
