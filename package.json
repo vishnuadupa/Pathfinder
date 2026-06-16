@@ -1,0 +1,7 @@
+{
+  "name": "pathfinder-root",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npm --prefix app install && npm --prefix app run build"
+  }
+}
