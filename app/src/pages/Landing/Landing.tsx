@@ -277,99 +277,80 @@ export function Landing() {
       {/* Ambient shadow overlay */}
       <div className={styles.mapTint} />
 
-      {/* Floating HUD status bar */}
-      <div className={styles.hudHeader}>
-        <div className={styles.hudBadge}>
-          <span className={styles.hudDot} />
-          SYSTEM_STATE: RUNNING_AUTO
+      {/* Central target radar scanner */}
+      <div className={styles.radarCrosshair}>
+        <div className={styles.crosshairX} />
+        <div className={styles.crosshairY} />
+        <div className={styles.crosshairRing1} />
+        <div className={styles.crosshairRing2} />
+        <div className={styles.crosshairData}>SCANNER_POS: 40.7484° N, 73.9857° W</div>
+      </div>
+
+      {/* TOP-LEFT: Identity HUD */}
+      <div className={styles.hudTopLeft}>
+        <div className={styles.hudBrand}>PATHFINDER // NET_GEOM_01</div>
+        <div className={styles.hudParam}>SYS_STATUS: <span className={styles.cyanText}>ACTIVE_SWEEP</span></div>
+        <div className={styles.hudParam}>COORDINATES: 40.7128°N / 74.0060°W</div>
+        <div className={styles.hudParam}>SECTORS: NY_METRO + NJ_TRANSIT</div>
+      </div>
+
+      {/* TOP-RIGHT: System Metrics HUD */}
+      <div className={styles.hudTopRight}>
+        <div className={styles.hudStatRow}>
+          <span className={styles.hudStatLabel}>MEM_LOAD</span>
+          <span className={styles.hudStatValue}>12.45 MB</span>
         </div>
-        <div className={styles.hudStats}>
-          <span className={styles.hudStat}>REGION: <strong>NYC_MANHATTAN</strong></span>
-          <span className={styles.hudStat}>INDEX: <strong>15.42k SEGMENTS</strong></span>
+        <div className={styles.hudStatRow}>
+          <span className={styles.hudStatLabel}>FPS_CAP</span>
+          <span className={styles.hudStatValue}>60.0 RAF</span>
+        </div>
+        <div className={styles.hudStatRow}>
+          <span className={styles.hudStatLabel}>SWEEP_FREQ</span>
+          <span className={styles.hudStatValue}>15.42 kHz</span>
         </div>
       </div>
 
-      <div className={styles.dashboardContainer}>
-        {/* Left Control Center Panel */}
-        <div className={styles.controlPanel}>
-          <div className={styles.titleBlock}>
-            <div className={styles.brandBadge}>CORE TOPOLOGY SOLVER</div>
-            <h1 className={styles.titleMain}>
-              Pathfinder<span className={styles.plus}>+</span>
-            </h1>
-            <p className={styles.titleSub}>
-              An interactive GIS instrument visualizing graph pathfinding mechanics. Observe wavefront propagation, dynamically adjusted congestion models, and negative cycle relaxation live.
-            </p>
-          </div>
+      {/* CENTER WIDGET: Launch Portal */}
+      <div className={styles.hudCenterPortal}>
+        <div className={styles.portalBadge}>TOPOLOGY EXPLORATION CONSOLE</div>
+        <h1 className={styles.portalTitle}>
+          PATHFINDER<span className={styles.portalPlus}>+</span>
+        </h1>
+        <p className={styles.portalSub}>
+          An advanced graph-simulation interface exploring spatial routing networks.
+        </p>
+        <Link to="/app" className={styles.portalLaunchBtn}>
+          ACTIVATE GEOMETRIC SIMULATOR
+        </Link>
+      </div>
 
-          <Link to="/app" className={styles.ctaButton}>
-            LAUNCH SYSTEM SIMULATOR
-          </Link>
-
-          {/* Reference Solver Info */}
-          <div className={styles.algoSection}>
-            <h3 className={styles.sectionHeader}>SOLVER REGISTER</h3>
-            <div className={styles.algoGrid}>
-              <div className={styles.algoItem}>
-                <span className={styles.algoNum}>01</span>
-                <div>
-                  <span className={styles.algoName}>A* & Dijkstra Solvers</span>
-                  <span className={styles.algoDesc}>Optimal weighted shortest path search</span>
-                </div>
-              </div>
-              <div className={styles.algoItem}>
-                <span className={styles.algoNum}>02</span>
-                <div>
-                  <span className={styles.algoName}>Bellman-Ford SPFA</span>
-                  <span className={styles.algoDesc}>Queue-optimized negative edge solver</span>
-                </div>
-              </div>
-              <div className={styles.algoItem}>
-                <span className={styles.algoNum}>03</span>
-                <div>
-                  <span className={styles.algoName}>BFS & DFS Traversals</span>
-                  <span className={styles.algoDesc}>Unweighted spatial expansion</span>
-                </div>
-              </div>
-              <div className={styles.algoItem}>
-                <span className={styles.algoNum}>04</span>
-                <div>
-                  <span className={styles.algoName}>Greedy Best-First</span>
-                  <span className={styles.algoDesc}>Heuristic-based grid convergence</span>
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* BOTTOM-LEFT: Telemetry Console stdout */}
+      <div className={styles.hudBottomLeft}>
+        <div className={styles.consoleHeader}>
+          <span>stdout // {activeAlgo.toUpperCase()} // {seedsCount} ORG // {edgesDrawn} EDG</span>
+          <span className={styles.consoleProgress}>{progress}% CONVERGE</span>
         </div>
-
-        {/* Right Telemetry Terminal Panel */}
-        <div className={styles.telemetryPanel}>
-          <div className={styles.telemetryHeader}>
-            <span className={styles.telemetryTitle}>TELEMETRY STREAM // {activeAlgo.toUpperCase()}</span>
-            <span className={styles.telemetryBadge}>LIVE_FEED</span>
-          </div>
-
-          <div className={styles.terminalBox}>
-            <div className={styles.terminalHeader}>
-              <span className={styles.terminalHeaderTitle}>SYS_LOG.stdout</span>
-              <span className={styles.terminalHeaderStats}>
-                {seedsCount} ORIGINS | {edgesDrawn} EDGES | {progress}% CONVERGENCE
-              </span>
+        <div className={styles.consoleLogs}>
+          {telemetryLogs.slice(-8).map((log, i) => (
+            <div key={i} className={styles.consoleLogLine}>
+              <span className={styles.consoleLineNum}>{(i + 1).toString().padStart(2, '0')}</span>
+              <span className={styles.consoleLineText}>{log}</span>
             </div>
-            <pre className={styles.terminalBody}>
-              {telemetryLogs.map((log, index) => (
-                <div key={index} className={styles.terminalLine}>
-                  <span className={styles.terminalLineNum}>{(index + 1).toString().padStart(2, '0')}</span>
-                  <span className={styles.terminalLineText}>{log}</span>
-                </div>
-              ))}
-            </pre>
-          </div>
+          ))}
+        </div>
+      </div>
 
-          <div className={styles.chartContainer}>
-            <div className={styles.chartBar} style={{ width: `${progress}%` }} />
-            <div className={styles.chartText}>FRONT WAVE CONVERGENCE INDEX // {progress}%</div>
-          </div>
+      {/* BOTTOM-RIGHT: Regional Registry */}
+      <div className={styles.hudBottomRight}>
+        <div className={styles.registryHeader}>REGIONAL REGISTER</div>
+        <div className={styles.registryGrid}>
+          <div>[01] MANHATTAN</div>
+          <div>[02] BROOKLYN</div>
+          <div>[03] QUEENS</div>
+          <div>[04] BRONX</div>
+          <div>[05] STATEN ISL</div>
+          <div>[06] JERSEY CITY</div>
+          <div>[07] HOBOKEN</div>
         </div>
       </div>
     </div>

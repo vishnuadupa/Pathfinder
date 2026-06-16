@@ -3,10 +3,11 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: #05060a;
+  background: #040508;
   display: flex;
   flex-direction: column;
   font-family: var(--font-sans), sans-serif;
+  color: var(--text-primary);
 }
 
 .mapBackground {
@@ -17,113 +18,196 @@
   z-index: 0;
   pointer-events: none;
   user-select: none;
+  opacity: 0.55;
+  filter: saturate(0.2) contrast(1.1);
 }
 
 .mapBackground :global(.leaflet-container) {
   cursor: default !important;
-  background: #05060a;
+  background: #040508;
 }
 
 .mapTint {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(5, 6, 10, 0.35) 0%, rgba(5, 6, 10, 0.75) 100%);
+  background: 
+    radial-gradient(circle at center, rgba(4, 5, 8, 0.15) 0%, rgba(4, 5, 8, 0.95) 90%),
+    linear-gradient(rgba(0, 255, 210, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 210, 0.015) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
   z-index: 1;
   pointer-events: none;
 }
 
-/* ─── HUD Status Bar ──────────────────────────────────────────────────────── */
-.hudHeader {
-  position: relative;
+/* ─── Central Radar Graphic ────────────────────────────────────────────────── */
+.radarCrosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.55;
+}
+
+.crosshairX {
+  position: absolute;
+  width: 280px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 210, 0.25) 50%, transparent);
+}
+
+.crosshairY {
+  position: absolute;
+  width: 1px;
+  height: 280px;
+  background: linear-gradient(180deg, transparent, rgba(0, 255, 210, 0.25) 50%, transparent);
+}
+
+.crosshairRing1, .crosshairRing2 {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px dashed rgba(0, 255, 210, 0.15);
+}
+
+.crosshairRing1 {
+  width: 160px;
+  height: 160px;
+  animation: spinCw 40s linear infinite;
+}
+
+.crosshairRing2 {
+  width: 240px;
+  height: 240px;
+  animation: spinCcw 60s linear infinite;
+}
+
+.crosshairData {
+  position: absolute;
+  top: 150px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+@keyframes spinCw {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spinCcw {
+  to { transform: rotate(-360deg); }
+}
+
+/* ─── Floating HUD Corner Overlays ────────────────────────────────────────── */
+
+/* TOP LEFT: Branding / Identification */
+.hudTopLeft {
+  position: absolute;
+  top: 24px;
+  left: 24px;
   z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(12, 14, 18, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 14px 20px;
+  border-radius: 4px;
+  backdrop-filter: blur(12px);
+}
+
+.hudBrand {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #ff5500;
+  margin-bottom: 2px;
+}
+
+.hudParam {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+}
+
+.cyanText {
+  color: #00ffd2;
+  font-weight: 600;
+}
+
+/* TOP RIGHT: Global Gauges */
+.hudTopRight {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(12, 14, 18, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 14px 20px;
+  border-radius: 4px;
+  backdrop-filter: blur(12px);
+  min-width: 150px;
+}
+
+.hudStatRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.25rem 2.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  background: rgba(8, 9, 13, 0.35);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  pointer-events: auto;
+  gap: 16px;
 }
 
-.hudBadge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #10b981;
-  text-shadow: 0 0 8px rgba(16, 185, 129, 0.35);
-}
-
-.hudDot {
-  width: 6px;
-  height: 6px;
-  background: #10b981;
-  border-radius: 50%;
-  box-shadow: 0 0 8px #10b981, 0 0 16px #10b981;
-  animation: pulse 2s infinite alternate;
-}
-
-.hudStats {
-  display: flex;
-  gap: 24px;
-}
-
-.hudStat {
-  font-size: 10.5px;
+.hudStatLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
   color: var(--text-muted);
-  letter-spacing: 0.05em;
 }
 
-.hudStat strong {
-  color: var(--text-secondary);
+.hudStatValue {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #00ffd2;
+  font-weight: 600;
 }
 
-/* ─── Layout Grid ────────────────────────────────────────────────────────── */
-.dashboardContainer {
-  position: relative;
+/* CENTER PORTAL: The Launch Overlay */
+.hudCenterPortal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 10;
-  flex: 1;
-  display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 2rem;
-  max-width: 1400px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 2rem 2.5rem 3rem;
-  align-items: center;
-  pointer-events: none;
-}
-
-/* ─── Graphite HUD Panels ─────────────────────────────────────────────────── */
-.controlPanel, .telemetryPanel {
-  pointer-events: auto;
-  background: rgba(12, 14, 18, 0.82);
+  width: 420px;
+  max-width: calc(100vw - 40px);
+  background: rgba(8, 10, 14, 0.65);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
-  padding: 2.5rem;
+  padding: 2.25rem;
   box-shadow: 
-    0 20px 40px -10px rgba(0, 0, 0, 0.75),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.telemetryPanel {
-  animation-delay: 0.1s;
+    0 30px 60px -15px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  text-align: center;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  animation: fadeScaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* ─── Typography & Brand HUD ──────────────────────────────────────────────── */
-.brandBadge {
-  display: inline-block;
+.portalBadge {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.1em;
   color: #ff5500;
@@ -134,300 +218,170 @@
   margin-bottom: 1rem;
 }
 
-.titleMain {
+.portalTitle {
   font-family: var(--font-display), sans-serif;
-  font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+  font-size: 32px;
   font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
   color: #f8fafc;
 }
 
-.plus {
+.portalPlus {
   color: #ff5500;
   margin-left: 2px;
 }
 
-.titleSub {
+.portalSub {
   color: var(--text-secondary);
-  font-size: 13.5px;
-  line-height: 1.6;
-  margin: 0 0 1.75rem;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0 0 1.5rem;
 }
 
-/* ─── HUD Solver register ────────────────────────────────────────────────── */
-.algoSection {
-  margin-top: 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding-top: 1.5rem;
-}
-
-.sectionHeader {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  margin: 0 0 1rem;
-  text-transform: uppercase;
-}
-
-.algoGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-}
-
-.algoItem {
-  display: flex;
-  gap: 12px;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.01);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 4px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.algoItem:hover {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-.algoNum {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  color: #00ffd2;
-  opacity: 0.8;
-  font-weight: 600;
-  padding-top: 2px;
-}
-
-.algoName {
-  display: block;
-  font-size: 12px;
-  font-weight: 650;
-  color: var(--text-primary);
-  margin-bottom: 2px;
-}
-
-.algoDesc {
-  display: block;
-  font-size: 9.5px;
-  color: var(--text-muted);
-}
-
-/* ─── Telemetry Board ────────────────────────────────────────────────────── */
-.telemetryHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding-bottom: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.telemetryTitle {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--text-secondary);
-}
-
-.telemetryBadge {
-  font-family: var(--font-mono);
-  font-size: 8.5px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: #ff5500;
-  background: rgba(255, 85, 0, 0.08);
-  border: 1px solid rgba(255, 85, 0, 0.25);
-  border-radius: 2px;
-  padding: 1px 6px;
-  animation: pulse 1.5s infinite alternate;
-}
-
-/* ─── HUD Terminal stdout ─────────────────────────────────────────────────── */
-.terminalBox {
-  background: rgba(4, 6, 8, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 4px;
-  font-family: var(--font-mono);
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.7);
-  margin-bottom: 1.5rem;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.terminalHeader {
-  background: rgba(255, 255, 255, 0.02);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 6px 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 9.5px;
-  color: var(--text-dim);
-}
-
-.terminalHeaderTitle {
-  font-weight: 700;
-}
-
-.terminalHeaderStats {
-  color: #00ffd2;
-}
-
-.terminalBody {
-  padding: 10px;
-  font-size: 10.5px;
-  line-height: 1.6;
-  height: 200px;
-  overflow-y: auto;
-  margin: 0;
-  color: #38bdf8; /* sky-400 */
-}
-
-.terminalLine {
-  display: flex;
-  gap: 12px;
-}
-
-.terminalLineNum {
-  color: var(--text-muted);
-  user-select: none;
-}
-
-.terminalLineText {
-  white-space: pre-wrap;
-  word-break: break-all;
-}
-
-/* ─── Real-time Progress telemetry ──────────────────────────────────────── */
-.chartContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.01);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 4px;
-  padding: 12px;
-  position: relative;
-  overflow: hidden;
-}
-
-.chartBar {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, rgba(0, 255, 210, 0.02) 0%, rgba(0, 255, 210, 0.08) 100%);
-  border-right: 2px solid #00ffd2;
-  transition: width 0.3s ease;
-  z-index: 1;
-}
-
-.chartText {
-  position: relative;
-  z-index: 2;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 700;
-  color: #00ffd2;
-  letter-spacing: 0.08em;
-  text-align: center;
-}
-
-/* ─── CTA button ──────────────────────────────────────────────────────────── */
-.ctaButton {
+.portalLaunchBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 12px 28px;
   border-radius: 4px;
-  background: transparent;
+  background: #ff5500;
   color: #ffffff;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-decoration: none;
-  border: 1px solid rgba(255, 85, 0, 0.4);
-  box-shadow: 0 4px 12px rgba(255, 85, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 24px rgba(255, 85, 0, 0.35);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  width: fit-content;
+  cursor: pointer;
 }
 
-.ctaButton:hover {
+.portalLaunchBtn:hover {
   transform: translateY(-1px);
-  background: rgba(255, 85, 0, 0.05);
-  border-color: #ff5500;
-  box-shadow: 0 6px 20px rgba(255, 85, 0, 0.3);
+  background: #ff6a1a;
+  box-shadow: 0 14px 30px rgba(255, 85, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
-.arrow {
-  display: none;
+/* BOTTOM LEFT: stdout stream */
+.hudBottomLeft {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  z-index: 10;
+  width: 360px;
+  background: rgba(12, 14, 18, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  backdrop-filter: blur(12px);
+  overflow: hidden;
 }
 
+.consoleHeader {
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 6px 12px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-dim);
+}
+
+.consoleProgress {
+  color: #00ffd2;
+  font-weight: 600;
+}
+
+.consoleLogs {
+  padding: 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.6;
+  max-height: 150px;
+  overflow-y: auto;
+  color: #38bdf8; /* sky-400 */
+}
+
+.consoleLogLine {
+  display: flex;
+  gap: 10px;
+}
+
+.consoleLineNum {
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.consoleLineText {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* BOTTOM RIGHT: Sector list */
+.hudBottomRight {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10;
+  background: rgba(12, 14, 18, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  padding: 14px 20px;
+  backdrop-filter: blur(12px);
+  width: 250px;
+}
+
+.registryHeader {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 4px;
+}
+
+.registryGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  color: var(--text-secondary);
+}
 
 /* ─── Animations ──────────────────────────────────────────────────────────── */
-@keyframes slideIn {
+@keyframes fadeScaleIn {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translate(-50%, -46%) scale(0.97);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate(-50%, -50%) scale(1);
   }
 }
 
 @keyframes pulse {
-  0% {
-    opacity: 0.6;
-  }
-  100% {
-    opacity: 1.0;
-  }
+  0% { opacity: 0.6; }
+  100% { opacity: 1.0; }
 }
 
-/* ─── Responsive Breakdown ────────────────────────────────────────────────── */
-@media (max-width: 1024px) {
-  .dashboardContainer {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    padding: 2rem;
+/* ─── Responsive Adjustments ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hudTopLeft, .hudTopRight, .hudBottomRight {
+    display: none; /* Hide secondary HUD info on mobile for clean visibility */
   }
   
-  .controlPanel, .telemetryPanel {
-    padding: 2rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .hudHeader {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    padding: 1rem 1.5rem;
-  }
-  
-  .hudStats {
-    flex-direction: column;
-    gap: 4px;
-  }
-  
-  .algoGrid {
-    grid-template-columns: 1fr;
-  }
-  
-  .dashboardContainer {
-    padding: 1.5rem 1rem;
-  }
-  
-  .titleMain {
-    font-size: 32px;
+  .hudBottomLeft {
+    width: auto;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
   }
 }

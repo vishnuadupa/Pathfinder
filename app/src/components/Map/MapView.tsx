@@ -261,10 +261,12 @@ export function MapView({
     
     // Set preferCanvas to enable blistering fast circle drawing
     const map = L.map('map', { 
-      zoomControl: true, 
+      zoomControl: false, 
       attributionControl: false,
       preferCanvas: true 
     });
+    
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
     
     L.tileLayer(TILE_URL, { attribution: TILE_ATTR, maxZoom: 19 }).addTo(map);
     map.setView([40.728, -73.96], 12);
@@ -357,6 +359,46 @@ export function MapView({
   }, []);
 
   // Snap back to Manhattan has been removed to allow persistent exploration of other boroughs.
+
+  // ── Map Bounds and Bounding Box Highlight ───────────────────────────────
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !graph) return;
+
+    const coords = Object.values(graph.nodes);
+    if (coords.length === 0) return;
+
+    const lats = coords.map(n => n.lat);
+    const lngs = coords.map(n => n.lng);
+    const minLat = Math.min(...lats);
+    const maxLat = Math.max(...lats);
+    const minLng = Math.min(...lngs);
+    const maxLng = Math.max(...lngs);
+
+    const padLat = (maxLat - minLat) * 0.05;
+    const padLng = (maxLng - minLng) * 0.05;
+    const bounds = L.latLngBounds(
+      [minLat - padLat, minLng - padLng],
+      [maxLat + padLat, maxLng + padLng]
+    );
+
+    map.setMaxBounds(bounds);
+    map.setMinZoom(10);
+    map.fitBounds(bounds);
+
+    const highlightRect = L.rectangle([ [minLat, minLng], [maxLat, maxLng] ], {
+      color: '#00ffd2',
+      weight: 1.2,
+      dashArray: '5, 5',
+      fillColor: 'rgba(0, 255, 210, 0.012)',
+      interactive: false
+    }).addTo(map);
+
+    return () => {
+      highlightRect.remove();
+    };
+  }, [graph]);
+
 
   // ── Redraw canvas when traffic toggles ──────────────────────────────────
   useEffect(() => {

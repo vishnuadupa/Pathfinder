@@ -118,6 +118,8 @@ def main():
             ("Queens, New York City, New York, USA", "Queens"),
             ("The Bronx, New York City, New York, USA", "The Bronx"),
             ("Staten Island, New York City, New York, USA", "Staten Island"),
+            ("Jersey City, New Jersey, USA", "Jersey City"),
+            ("Hoboken, New Jersey, USA", "Hoboken"),
         ]
 
     all_nodes = {}
