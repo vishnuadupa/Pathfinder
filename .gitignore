@@ -1,0 +1,33 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node modules & build outputs
+**/node_modules/
+**/dist/
+**/dist-ssr/
+app/tsconfig.tsbuildinfo
+
+# Python caches and local graph caches
+**/__pycache__/
+**/*.pyc
+**/cache/
+.graphify_python
+.graphify_uncached.txt
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.claude/
+.gemini/
