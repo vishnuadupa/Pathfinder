@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -17,6 +17,15 @@ interface GraphData {
   edges: Record<string, { to: string; weight: number }[]>;
 }
 
+const RUNNING_ALGORITHMS = [
+  "Dijkstra's Search",
+  "A* Search Heuristics",
+  "Bellman-Ford Solver (SPFA)",
+  "Breadth-First Search (BFS)",
+  "Depth-First Search (DFS)",
+  "Greedy Best-First Solver"
+];
+
 export function Landing() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef          = useRef<L.Map | null>(null);
@@ -24,6 +33,12 @@ export function Landing() {
   const rafRef          = useRef<number | null>(null);
   const graphRef        = useRef<GraphData | null>(null);
   const cycleTimerRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Live simulation telemetry state
+  const [seedsCount, setSeedsCount] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [activeAlgo, setActiveAlgo] = useState("A* Search Heuristics");
+  const [edgesDrawn, setEdgesDrawn] = useState(0);
 
   // ── Init Leaflet map (frozen / decorative) ───────────────────────────────
   useEffect(() => {
@@ -43,7 +58,6 @@ export function Landing() {
     L.tileLayer(TILE_URL, { attribution: TILE_ATTR, maxZoom: 19 }).addTo(map);
     map.setView([40.748, -73.984], 13);
 
-    // Canvas overlay in overlayPane (same technique as MapView)
     const overlayPane = map.getPanes().overlayPane;
     const size        = map.getSize();
 
@@ -55,7 +69,6 @@ export function Landing() {
     overlayPane.appendChild(canvas);
     canvasRef.current = canvas;
 
-    // Keep canvas position synced
     const alignCanvas = () => {
       const topLeft = map.containerPointToLayerPoint([0, 0]);
       L.DomUtil.setPosition(canvas as unknown as HTMLElement, topLeft);
@@ -65,7 +78,6 @@ export function Landing() {
 
     mapRef.current = map;
 
-    // Fetch graph and start ambient animation
     fetch('/graph.json')
       .then(r => r.json())
       .then((data: GraphData) => {
@@ -73,7 +85,7 @@ export function Landing() {
         startMoldCycle();
       })
       .catch(() => {
-        // No graph — still show page, no animation
+        // Safe fallback
       });
 
     return () => {
@@ -164,12 +176,21 @@ export function Landing() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const numSeeds = 3 + Math.floor(Math.random() * 2);
-    const seeds    = pickSpreadNodes(graph, numSeeds);
+    setSeedsCount(numSeeds);
+    
+    // Pick background solver name randomly
+    const algoName = RUNNING_ALGORITHMS[Math.floor(Math.random() * RUNNING_ALGORITHMS.length)];
+    setActiveAlgo(algoName);
+
+    const seeds = pickSpreadNodes(graph, numSeeds);
     if (seeds.length === 0) return;
 
     const edges          = buildBFSEdges(graph, seeds);
     let   edgeIndex      = 0;
     const EDGES_PER_FRAME = 3;
+
+    setProgress(0);
+    setEdgesDrawn(0);
 
     const project = (lat: number, lng: number) => {
       const topLeft = map.containerPointToLayerPoint([0, 0]);
@@ -182,6 +203,9 @@ export function Landing() {
 
       const batch = edges.slice(edgeIndex, edgeIndex + EDGES_PER_FRAME);
       edgeIndex  += EDGES_PER_FRAME;
+
+      setEdgesDrawn(edgeIndex);
+      setProgress(Math.round((edgeIndex / edges.length) * 100));
 
       ctx.lineCap  = 'round';
       ctx.lineJoin = 'round';
@@ -229,34 +253,107 @@ export function Landing() {
 
   return (
     <div className={styles.landingRoot}>
-      {/* Real Leaflet map — frozen, full-screen background */}
+      {/* Decorative background map */}
       <div ref={mapContainerRef} className={styles.mapBackground} />
 
-      {/* Dark tint so glass panel reads clearly */}
+      {/* Ambient shadow overlay */}
       <div className={styles.mapTint} />
 
-      {/* Frosted-glass hero panel */}
-      <div className={styles.heroWrapper}>
-        <div className={styles.glassPanel}>
+      {/* Floating HUD status bar */}
+      <div className={styles.hudHeader}>
+        <div className={styles.hudBadge}>
+          <span className={styles.hudDot} />
+          SYSTEM STATUS: ONLINE
+        </div>
+        <div className={styles.hudStats}>
+          <span className={styles.hudStat}>REGION: <strong>NEW YORK CITY (MANHATTAN)</strong></span>
+          <span className={styles.hudStat}>STREET INDEX: <strong>15,422 SEGMENTS</strong></span>
+        </div>
+      </div>
 
+      <div className={styles.dashboardContainer}>
+        {/* Left Control Center Panel */}
+        <div className={styles.controlPanel}>
           <div className={styles.titleBlock}>
+            <div className={styles.brandBadge}>ALGORITHMIC SIMULATION SUITE</div>
             <h1 className={styles.titleMain}>
               Pathfinder<span className={styles.plus}>+</span>
             </h1>
-            <p className={styles.titleSub}>Navigate the Optimal Route</p>
-          </div>
-
-          <div className={styles.pillRow}>
-            <span className={styles.pill}>6 Algorithms</span>
-            <span className={styles.pill}>Real-time Visualization</span>
-            <span className={styles.pill}>Dynamic Hazards</span>
+            <p className={styles.titleSub}>
+              A high-fidelity visualizer for graph pathfinding mechanics. Experience real-time wavefront propagation, congestion simulation, and topological search solvers in motion.
+            </p>
           </div>
 
           <Link to="/app" className={styles.ctaButton}>
-            Start Exploring&nbsp;&rarr;
+            Launch Visualizer <span className={styles.arrow}>&rarr;</span>
           </Link>
 
-          <p className={styles.tagline}>Built on real Manhattan road network data</p>
+          {/* Reference Solver Info */}
+          <div className={styles.algoSection}>
+            <h3 className={styles.sectionHeader}>SUPPORTED SOLVERS</h3>
+            <div className={styles.algoGrid}>
+              <div className={styles.algoItem}>
+                <span className={styles.algoNum}>01</span>
+                <div>
+                  <span className={styles.algoName}>A* Search & Dijkstra</span>
+                  <span className={styles.algoDesc}>Weighted shortest-path solvers</span>
+                </div>
+              </div>
+              <div className={styles.algoItem}>
+                <span className={styles.algoNum}>02</span>
+                <div>
+                  <span className={styles.algoName}>Bellman-Ford (SPFA)</span>
+                  <span className={styles.algoDesc}>Queue-optimized routing</span>
+                </div>
+              </div>
+              <div className={styles.algoItem}>
+                <span className={styles.algoNum}>03</span>
+                <div>
+                  <span className={styles.algoName}>BFS & DFS Traversals</span>
+                  <span className={styles.algoDesc}>Unweighted graph search</span>
+                </div>
+              </div>
+              <div className={styles.algoItem}>
+                <span className={styles.algoNum}>04</span>
+                <div>
+                  <span className={styles.algoName}>Greedy Best-First</span>
+                  <span className={styles.algoDesc}>Heuristic-based exploration</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Telemetry Panel */}
+        <div className={styles.telemetryPanel}>
+          <div className={styles.telemetryHeader}>
+            <span className={styles.telemetryTitle}>LIVE RUNTIME SIMULATION</span>
+            <span className={styles.telemetryBadge}>ACTIVE</span>
+          </div>
+
+          <div className={styles.telemetryGrid}>
+            <div className={styles.telemetryItem}>
+              <span className={styles.telemetryLabel}>BACKGROUND SOLVER</span>
+              <span className={styles.telemetryValue}>{activeAlgo}</span>
+            </div>
+            <div className={styles.telemetryItem}>
+              <span className={styles.telemetryLabel}>ACTIVE SEED ORIGINS</span>
+              <span className={styles.telemetryValue}>{seedsCount} COORDINATES</span>
+            </div>
+            <div className={styles.telemetryItem}>
+              <span className={styles.telemetryLabel}>PROPAGATED EDGES</span>
+              <span className={styles.telemetryValue}>{edgesDrawn.toLocaleString()} / {progress}%</span>
+            </div>
+            <div className={styles.telemetryItem}>
+              <span className={styles.telemetryLabel}>TELEMETRY PROFILE</span>
+              <span className={styles.telemetryValue}>RAF ACCELERATED</span>
+            </div>
+          </div>
+
+          <div className={styles.chartContainer}>
+            <div className={styles.chartBar} style={{ width: `${progress}%` }} />
+            <div className={styles.chartText}>SOLVER WAVEFRONT CONVERGENCE PROGRESS</div>
+          </div>
         </div>
       </div>
     </div>
