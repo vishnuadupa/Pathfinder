@@ -36,13 +36,7 @@ export function bellmanFord(
   // SPFA optimization: only process nodes whose distances were updated
   const queue = [start];
   const inQueue = new Set([start]);
-
-  // Relaxation guard: if we relax more than nodes.length times without
-  // reaching `end`, we're likely in a very large/disconnected component.
-  // (True negative-cycle detection would require V-1 full passes; this is
-  // a practical safeguard for the SPFA variant used here.)
-  let relaxationCount = 0;
-  const maxRelaxations = nodes.length * 2;
+  const popCount: Record<string, number> = {};
 
   while (queue.length > 0) {
     peakFrontierSize = Math.max(peakFrontierSize, queue.length);
@@ -54,9 +48,10 @@ export function bellmanFord(
     // not just its updated neighbors.
     visitedOrder.push(u);
 
-    // Relaxation guard: bail if we're stuck in extremely large components
-    relaxationCount++;
-    if (relaxationCount > maxRelaxations) break;
+    // Negative cycle detection: if a single node is popped more than
+    // nodes.length times, a negative cycle exists and we must abort.
+    popCount[u] = (popCount[u] ?? 0) + 1;
+    if (popCount[u] > nodes.length) break;
 
     for (const edge of graph.edges[u] ?? []) {
       if (!reachable.has(edge.to)) continue;

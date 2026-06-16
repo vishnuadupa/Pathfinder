@@ -7,6 +7,7 @@
 
 :root {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-display: 'Outfit', var(--font-sans);
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
 
   /* Premium Dark Palette */
@@ -197,4 +198,25 @@ body {
    via requestAnimationFrame so the correct path length can be measured first. */
 .animated-path {
   filter: drop-shadow(0 0 5px rgba(52, 211, 153, 0.75)) drop-shadow(0 0 12px rgba(52, 211, 153, 0.35));
+}
+
+@media (max-width: 1024px) {
+  .content {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  
+  .mapArea {
+    flex: none;
+    width: 100%;
+    height: 55vh;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  
+  .content > div:not(.mapArea) {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: auto !important;
+  }
 }
